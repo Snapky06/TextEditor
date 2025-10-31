@@ -7,6 +7,8 @@ qt_standard_project_setup()
 
 qt_add_executable(EditorSN
     main.cpp
+    Node.h
+    LinkedList.h
 )
 
 target_link_libraries(EditorSN
