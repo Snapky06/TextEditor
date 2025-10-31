@@ -10,6 +10,7 @@ qt_add_executable(EditorSN
     Node.h
     LinkedList.h
     Stack.h
+    Operation.h
 )
 
 target_link_libraries(EditorSN
