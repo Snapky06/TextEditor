@@ -35,19 +35,19 @@ Operation inverseOf(const Operation& op) {
 }
 
 
-bool applyOperation(LinkedList<std::string>& doc,const Operation& op,Stack<Operation>& pushHere) {
+bool applyOperation(LinkedList<std::string>& lista,const Operation& op,Stack<Operation>& pushHere) {
     switch (op.type) {
     case opType::Insert: {
-        if (!doc.insert(op.pos, op.newValue)) return false;
+        if (!lista.insert(op.pos, op.newValue)) return false;
         break;
     }
     case opType::Delete: {
         std::string removed;
-        if (!doc.erase(op.pos, &removed)) return false;
+        if (!lista.erase(op.pos, &removed)) return false;
         break;
     }
     case opType::Replace: {
-        try { doc.at(op.pos) = op.newValue; }
+        try { lista.at(op.pos) = op.newValue; }
         catch (...) { return false; }
         break;
     }

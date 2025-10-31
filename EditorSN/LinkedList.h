@@ -1,15 +1,10 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#include <stdexcept>
+#include "Node.h"
+#include <iostream>
+#include <ostream>
 #include <cstddef>
-
-template <class T>
-struct Node {
-    T data;
-    Node* next;
-    Node(const T& d) : data(d), next(nullptr) {}
-};
 
 template <class T>
 class LinkedList {
@@ -69,7 +64,7 @@ public:
     }
 
     T& at(size_t pos) {
-        if (pos >= n) throw std::out_of_range("Posición inválida");
+        if (pos >= n) std::cout<< "Posicion Invalida" << std::endl; return;
         Node<T>* cur = head;
         for (size_t i = 0; i < pos; ++i)
             cur = cur->next;
@@ -77,7 +72,7 @@ public:
     }
 
     const T& at(size_t pos) const {
-        if (pos >= n) throw std::out_of_range("Posición inválida");
+        if (pos >= n) std::cout<< "Posicion Invalida" << std::endl; return;
         Node<T>* cur = head;
         for (size_t i = 0; i < pos; ++i)
             cur = cur->next;
