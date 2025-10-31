@@ -120,5 +120,9 @@ int main() {
     }
 
     cout << "Saliendo...\n";
+
+    lista.clear();
+    undoStack.clear();
+    redoStack.clear();
     return 0;
 }
