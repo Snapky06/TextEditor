@@ -11,7 +11,12 @@ class LinkedList {
     size_t count;
 
 public:
-    LinkedList() : head(nullptr), count(0) {}
+
+    LinkedList() {
+        head = nullptr;
+        count = 0;
+    }
+
     ~LinkedList() { clear(); }
 
     void clear() {
