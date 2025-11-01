@@ -2,127 +2,141 @@
 #include <string>
 #include <limits>
 #include "LinkedList.h"
-#include "Stack.h"
 #include "Operation.h"
 
-using std::cout;
-using std::cin;
-using std::string;
+using namespace std;
 
-void mostrarLista(const LinkedList<string>& lista) {
-    if (lista.size() == 0) {
-        cout << "(Lista vacia)\n";
+static void printList(const LinkedList<string>& list) {
+    if (list.size() == 0) {
+        cout << "List is empty." << endl;
         return;
     }
-    for (size_t i = 0; i < lista.size(); ++i)
-        cout << i << ": " << lista.at(i) << "\n";
+    for (size_t i = 0; i < list.size(); ++i)
+        cout << i << ": " << list.at(i) << endl;
 }
 
-void limpiarEntrada() {
+static void resetInput() {
     cin.clear();
-    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
 int main() {
-    LinkedList<string> lista;
-    Stack<Operation> undoStack, redoStack;
+    LinkedList<string> list;
+    Stack<Operation> undoStack;
+    Stack<Operation> redoStack;
 
-    cout << "=== Mini Editor ===\n";
+    cout << "Word List Editor" << endl;
 
-    int opt;
+    int choice;
     while (true) {
-        cout << "\n1) Insertar palabra\n"
-                "2) Eliminar palabra\n"
-                "3) Reemplazar palabra\n"
-                "4) Mostrar lista\n"
-                "5) Deshacer (Undo)\n"
-                "6) Rehacer (Redo)\n"
-                "0) Salir\n> " << std::endl;
+        cout << endl;
+        cout << "1) Add word" << endl;
+        cout << "2) Remove word" << endl;
+        cout << "3) Replace word" << endl;
+        cout << "4) Show list" << endl;
+        cout << "5) Undo" << endl;
+        cout << "6) Redo" << endl;
+        cout << "0) Exit" << endl;
+        cout << "Enter option: ";
 
-        if (!(cin >> opt)) { limpiarEntrada(); continue; }
-        if (opt == 0) break;
+        if (!(cin >> choice)) { resetInput(); continue; }
+        if (choice == 0) break;
 
-        size_t pos;
-        string palabra;
+        size_t index;
+        string word;
 
-        switch (opt) {
+        switch (choice) {
         case 1: {
-            cout << "Posicion: " << std::endl;
-            if (!(cin >> pos)) { limpiarEntrada(); break; }
-            cout << "Palabra: " << std::endl ;
-            if (!(cin >> palabra)) { limpiarEntrada(); break; }
-            Operation op{opType::Insert, pos, "", palabra};
-            if (applyOperation(lista, op, undoStack)) {
+            cout << "Index to insert at: ";
+            if (!(cin >> index)) { resetInput(); break; }
+            cout << "Word: ";
+            if (!(cin >> word)) { resetInput(); break; }
+
+            Operation op{ActionType::Insert, index, "", word};
+            if (applyAction(list, op, undoStack)) {
                 redoStack.clear();
-                cout << "Insertado.\n" << std::endl ;
-            } else cout << "No se pudo insertar.\n" << std::endl;
+                cout << "Added." << endl;
+            } else {
+                cout << "Could not add at that index." << endl;
+            }
             break;
         }
+
         case 2: {
-            cout << "Posicion: " << std::endl ;
-            if (!(cin >> pos)) { limpiarEntrada(); break; }
+            cout << "Index to remove: ";
+            if (!(cin >> index)) { resetInput(); break; }
             try {
-                string old = lista.at(pos);
-                Operation op{opType::Delete, pos, old, ""};
-                if (applyOperation(lista, op, undoStack)) {
+                string oldWord = list.at(index);
+                Operation op{ActionType::Delete, index, oldWord, ""};
+                if (applyAction(list, op, undoStack)) {
                     redoStack.clear();
-                    cout << "Eliminado.\n" << std::endl;
-                } else cout << "No se pudo eliminar.\n" << std::endl;
-            } catch (...) { cout << "Posicion invalida.\n" << std::endl; }
+                    cout << "Removed." << endl;
+                } else {
+                    cout << "Could not remove." << endl;
+                }
+            } catch (...) {
+                cout << "Invalid index." << endl;
+            }
             break;
         }
+
         case 3: {
-            cout << "Posicion: " << std::endl;
-            if (!(cin >> pos)) { limpiarEntrada(); break; }
-            cout << "Nueva palabra: " << std::endl;
-            if (!(cin >> palabra)) { limpiarEntrada(); break; }
+            cout << "Index to replace: ";
+            if (!(cin >> index)) { resetInput(); break; }
+            cout << "New word: ";
+            if (!(cin >> word)) { resetInput(); break; }
             try {
-                string old = lista.at(pos);
-                Operation op{opType::Replace, pos, old, palabra};
-                if (applyOperation(lista, op, undoStack)) {
+                string oldWord = list.at(index);
+                Operation op{ActionType::Replace, index, oldWord, word};
+                if (applyAction(list, op, undoStack)) {
                     redoStack.clear();
-                    cout << "Reemplazado.\n" << std::endl;
-                } else cout << "No se pudo reemplazar.\n" << std::endl;
-            } catch (...) { cout << "Posicion invalida.\n" << std::endl; }
+                    cout << "Replaced." << endl;
+                } else {
+                    cout << "Could not replace." << endl;
+                }
+            } catch (...) {
+                cout << "Invalid index." << endl;
+            }
             break;
         }
+
         case 4:
-            mostrarLista(lista);
+            printList(list);
             break;
+
         case 5: {
             if (!undoStack.empty()) {
                 Operation inv = undoStack.top();
                 undoStack.pop();
-                if (applyOperation(lista, inv, redoStack)) {
-                    cout << "Undo ejecutado.\n" << std::endl;
-                }
+                if (applyAction(list, inv, redoStack))
+                    cout << "Undone." << endl;
             } else {
-                cout << "Nada que deshacer.\n" << std::endl;
+                cout << "Nothing to undo." << endl;
             }
             break;
         }
+
         case 6: {
             if (!redoStack.empty()) {
                 Operation inv = redoStack.top();
                 redoStack.pop();
-                if (applyOperation(lista, inv, undoStack)) {
-                    cout << "Redo ejecutado.\n" << std::endl;
-                }
+                if (applyAction(list, inv, undoStack))
+                    cout << "Redone." << endl;
             } else {
-                cout << "Nada que rehacer.\n"<< std::endl;
+                cout << "Nothing to redo." << endl;
             }
             break;
         }
 
         default:
-            cout << "Opcion invalida.\n"<< std::endl;
+            cout << "Invalid option." << endl;
         }
     }
 
-    cout << "Saliendo\n"<< std::endl;
-
-    lista.clear();
+    cout << endl << "Cleaning up..." << endl;
+    list.clear();
     undoStack.clear();
     redoStack.clear();
+    cout << "Done." << endl;
     return 0;
 }

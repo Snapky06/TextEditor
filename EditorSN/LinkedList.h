@@ -1,84 +1,84 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#include "Node.h"
-#include <iostream>
-#include <ostream>
+#include <stdexcept>
 #include <cstddef>
+#include "Node.h"
 
 template <class T>
 class LinkedList {
-    Node<T>* head = nullptr;
-    size_t n = 0;
+    Node<T>* head;
+    size_t count;
 
 public:
+    LinkedList() : head(nullptr), count(0) {}
     ~LinkedList() { clear(); }
 
     void clear() {
-        Node<T>* cur = head;
-        while (cur) {
-            Node<T>* nx = cur->next;
-            delete cur;
-            cur = nx;
+        Node<T>* current = head;
+        while (current) {
+            Node<T>* next = current->next;
+            delete current;
+            current = next;
         }
         head = nullptr;
-        n = 0;
+        count = 0;
     }
 
-    size_t size() const { return n; }
+    size_t size() const { return count; }
 
-    bool insert(size_t pos, const T& value) {
-        if (pos > n) return false;
-        Node<T>* nuevo = new Node<T>(value);
-        if (pos == 0) {
-            nuevo->next = head;
-            head = nuevo;
+    bool insert(size_t index, const T& value) {
+        if (index > count) return false;
+
+        Node<T>* node = new Node<T>(value);
+
+        if (index == 0) {
+            node->next = head;
+            head = node;
         } else {
-            Node<T>* cur = head;
-            for (size_t i = 0; i + 1 < pos; ++i)
-                cur = cur->next;
-            nuevo->next = cur->next;
-            cur->next = nuevo;
+            Node<T>* current = head;
+            for (size_t i = 0; i + 1 < index; ++i) current = current->next;
+            node->next = current->next;
+            current->next = node;
         }
-        ++n;
+
+        ++count;
         return true;
     }
 
-    bool erase(size_t pos, T* removedOut = nullptr) {
-        if (pos >= n) return false;
+    bool remove(size_t index, T* removed = nullptr) {
+        if (index >= count) return false;
+
         Node<T>* del;
-        if (pos == 0) {
+
+        if (index == 0) {
             del = head;
             head = head->next;
         } else {
-            Node<T>* cur = head;
-            for (size_t i = 0; i + 1 < pos; ++i)
-                cur = cur->next;
-            del = cur->next;
-            cur->next = del->next;
+            Node<T>* current = head;
+            for (size_t i = 0; i + 1 < index; ++i) current = current->next;
+            del = current->next;
+            current->next = del->next;
         }
-        if (removedOut) *removedOut = del->data;
+
+        if (removed) *removed = del->value;
         delete del;
-        --n;
+        --count;
         return true;
     }
 
-    T& at(size_t pos) {
-        if (pos >= n) std::cout<< "Posicion Invalida" << std::endl; return;
-        Node<T>* cur = head;
-        for (size_t i = 0; i < pos; ++i)
-            cur = cur->next;
-        return cur->data;
+    T& at(size_t index) {
+        if (index >= count) throw std::out_of_range("index out of range");
+        Node<T>* current = head;
+        for (size_t i = 0; i < index; ++i) current = current->next;
+        return current->value;
     }
 
-    const T& at(size_t pos) const {
-        if (pos >= n) std::cout<< "Posicion Invalida" << std::endl; return;
-        Node<T>* cur = head;
-        for (size_t i = 0; i < pos; ++i)
-            cur = cur->next;
-        return cur->data;
+    const T& at(size_t index) const {
+        if (index >= count) throw std::out_of_range("index out of range");
+        Node<T>* current = head;
+        for (size_t i = 0; i < index; ++i) current = current->next;
+        return current->value;
     }
 };
-
-#endif // LINKEDLIST_H
-
+#endif //LINKEDLIST_H

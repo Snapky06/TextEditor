@@ -1,61 +1,60 @@
 #ifndef OPERATION_H
 #define OPERATION_H
+
+#include <string>
 #include "LinkedList.h"
 #include "Stack.h"
-#include <string>
 
-enum class opType { Insert, Delete , Replace};
+enum class ActionType { Insert, Delete, Replace };
 
-struct Operation
-{
-    opType type;
-    std::size_t pos;
+struct Operation {
+    ActionType type;
+    size_t index;
     std::string oldValue;
     std::string newValue;
 };
 
-Operation inverseOf(const Operation& op) {
+inline Operation inverseOf(const Operation& op) {
     Operation inv = op;
     switch (op.type) {
-    case opType::Insert:
-        inv.type = opType::Delete;
+    case ActionType::Insert:
+        inv.type = ActionType::Delete;
         inv.oldValue = op.newValue;
         inv.newValue.clear();
         break;
-    case opType::Delete:
-        inv.type = opType::Insert;
+    case ActionType::Delete:
+        inv.type = ActionType::Insert;
         inv.newValue = op.oldValue;
         inv.oldValue.clear();
         break;
-    case opType::Replace:
+    case ActionType::Replace:
         std::swap(inv.oldValue, inv.newValue);
         break;
     }
     return inv;
 }
 
-
-bool applyOperation(LinkedList<std::string>& lista,const Operation& op,Stack<Operation>& pushHere) {
+inline bool applyAction(LinkedList<std::string>& list,
+                        const Operation& op,
+                        Stack<Operation>& inverseStack) {
     switch (op.type) {
-    case opType::Insert: {
-        if (!lista.insert(op.pos, op.newValue)) return false;
+    case ActionType::Insert: {
+        if (!list.insert(op.index, op.newValue)) return false;
         break;
     }
-    case opType::Delete: {
+    case ActionType::Delete: {
         std::string removed;
-        if (!lista.erase(op.pos, &removed)) return false;
+        if (!list.remove(op.index, &removed)) return false;
         break;
     }
-    case opType::Replace: {
-        try { lista.at(op.pos) = op.newValue; }
+    case ActionType::Replace: {
+        try { list.at(op.index) = op.newValue; }
         catch (...) { return false; }
         break;
     }
     }
-
-    pushHere.push(inverseOf(op));
+    inverseStack.push(inverseOf(op));
     return true;
 }
-
 
 #endif // OPERATION_H

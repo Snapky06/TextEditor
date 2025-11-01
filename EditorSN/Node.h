@@ -2,10 +2,13 @@
 #define NODE_H
 
 template <class T>
-struct Node {
-    T data;
+class Node {
+public:
+    T value;
     Node* next;
-    Node(const T& d): data(d), next(nullptr) {}
+
+    Node(const T& data) : value(data), next(nullptr) {}
 };
 
-#endif // NODE_H
+#endif //NODE_H
+
